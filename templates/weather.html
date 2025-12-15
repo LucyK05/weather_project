@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Weather Dashboard{% endblock %}
+
+{% block content %}
+<h1>Weather Dashboard</h1>
+<p>Enter a location to view current conditions and 8-day forecast.</p>
+
+<form method="GET" class="mb-4">
+    <div class="input-group">
+        <input type="text" class="form-control" name="location" placeholder="City, ZIP, or coordinates" value="{{ location }}">
+        <button class="btn btn-primary" type="submit">Get Weather</button>
+    </div>
+    <input type="hidden" name="unit" value="{{ unit }}">
+</form>
+
+{% if weather %}
+    <div class="mb-4 text-end">
+        {% set new_unit = 'f' if unit == 'c' else 'c' %}
+        <a href="{{ url_for('weather', location=location, unit=new_unit) }}" class="btn btn-outline-secondary">
+            Switch to °{{ 'F' if unit == 'c' else 'C' }}
+        </a>
+    </div>
+
+    <!-- Save Location Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="POST" class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label class="col-form-label"><strong>Save this location:</strong></label>
+                </div>
+                <div class="col-auto">
+                    <input type="text" class="form-control" name="save_name" placeholder="e.g., Home, Office" required>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" name="save_location" class="btn btn-success">Save Location</button>
+                </div>
+                <input type="hidden" name="location" value="{{ location }}">
+                <input type="hidden" name="unit" value="{{ unit }}">
+            </form>
+        </div>
+    </div>
+
+    <!-- Current Weather -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2>Current Weather in {{ weather.location.name }}, {{ weather.location.country }}</h2>
+            <p>Last updated: {{ weather.current.last_updated }}</p>
+        </div>
+        <div class="card-body text-center">
+            <img src="https:{{ weather.current.condition.icon }}" alt="{{ weather.current.condition.text }}" style="max-width: 128px;">
+            <h1 class="display-1">
+                {% if unit == 'c' %}{{ weather.current.temp_c }}°C{% else %}{{ weather.current.temp_f }}°F{% endif %}
+            </h1>
+            <h3>{{ weather.current.condition.text }}</h3>
+            <p>Feels like: {% if unit == 'c' %}{{ weather.current.feelslike_c }}°C{% else %}{{ weather.current.feelslike_f }}°F{% endif %}</p>
+            <p>Humidity: {{ weather.current.humidity }}%</p>
+            <p>Wind: {{ weather.current.wind_kph }} kph ({{ weather.current.wind_mph }} mph)</p>
+        </div>
+    </div>
+
+    <!-- 8-Day Forecast -->
+    <h3>8-Day Forecast</h3>
+    <div class="forecast-row">
+        {% for day in weather.forecast.forecastday %}
+            <div class="forecast-card">
+                <div class="card h-100">
+                    <div class="card-header text-center py-2"><h6 class="mb-0">{{ day.date }}</h6></div>
+                    <div class="card-body text-center py-3">
+                        <img src="https:{{ day.day.condition.icon }}" alt="{{ day.day.condition.text }}" class="mb-2" style="max-width: 64px;">
+                        <p class="small mb-2">{{ day.day.condition.text }}</p>
+                        <p class="fw-bold mb-1">
+                            {% if unit == 'c' %}{{ day.day.maxtemp_c }}°C{% else %}{{ day.day.maxtemp_f }}°F{% endif %}
+                        </p>
+                        <p class="text-muted small mb-0">
+                            {% if unit == 'c' %}{{ day.day.mintemp_c }}°C{% else %}{{ day.day.mintemp_f }}°F{% endif %}
+                        </p>
+                    </div>
+                    <div class="card-footer text-center small text-muted py-2">
+                        Precip: {{ day.day.totalprecip_mm }} mm
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+{% endblock %}

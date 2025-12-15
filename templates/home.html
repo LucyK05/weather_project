@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Home - Weather App{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center py-5">
+    <h1 class="display-4">Welcome to the Weather App</h1>
+    <p class="lead">Get current weather and 8-day forecasts for any location worldwide.</p>
+    <hr class="my-4">
+    <p>Search locations, toggle between Celsius and Fahrenheit, and save your favorite places for quick access.</p>
+    <a class="btn btn-primary btn-lg" href="{{ url_for('weather') }}">Go to Weather Dashboard</a>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <h3>🌤️ Real-time Data</h3>
+        <p>Powered by WeatherAPI.com</p>
+    </div>
+    <div class="col-md-4">
+        <h3>📱 Responsive Design</h3>
+        <p>Works perfectly on desktop and mobile</p>
+    </div>
+    <div class="col-md-4">
+        <h3>⭐ Save Locations</h3>
+        <p>Quickly check weather for your favorite places</p>
+    </div>
+</div>
+{% endblock %}

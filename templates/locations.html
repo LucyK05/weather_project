@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Saved Locations{% endblock %}
+
+{% block content %}
+<h1>Saved Locations</h1>
+<p>Quickly view current weather for your saved places.</p>
+
+{% if locations %}
+    <div class="row">
+        {% for loc in locations %}
+            <div class="col-md-4 col-lg-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="mb-0">{{ loc.name }}</h5>
+                            <small class="text-muted">
+                                {{ loc.location.name if loc.location else loc.query }}
+                            </small>
+                        </div>
+
+                        <!-- Delete Button Form -->
+                        <form method="POST"
+                              action="{{ url_for('delete_location', loc_id=loc.id) }}"
+                              onsubmit="return confirm('Are you sure you want to delete {{ loc.name }}?');">
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm"
+                                    title="Delete location">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="card-body text-center">
+                        {% if loc.current %}
+                            <img src="https:{{ loc.current.condition.icon }}"
+                                 alt="{{ loc.current.condition.text }}"
+                                 style="max-width: 80px;">
+                            <h3>
+                                {{ loc.current.temp_c }}°C
+                                <small class="text-muted">({{ loc.current.temp_f }}°F)</small>
+                            </h3>
+                            <p>{{ loc.current.condition.text }}</p>
+                            <a href="{{ url_for('weather', location=loc.query) }}"
+                               class="btn btn-primary btn-sm mt-2">Full Forecast</a>
+                        {% else %}
+                            <p class="text-danger">{{ loc.error|default('Unable to fetch current weather') }}</p>
+                            <a href="{{ url_for('weather', location=loc.query) }}"
+                               class="btn btn-outline-secondary btn-sm">Try Again</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        No saved locations yet. Go to the <a href="{{ url_for('weather') }}">Weather Dashboard</a> and save some!
+    </div>
+{% endif %}
+{% endblock %}
